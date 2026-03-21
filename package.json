@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "npm run build && vercel --prod",
+    "push-deploy": "git add . && git commit -m \"$(date '+%Y-%m-%d %H:%M:%S')\" && git push && vercel --prod",
+    "quick-deploy": "git add . && git commit -m \"auto-deploy\" && git push && vercel --prod"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
