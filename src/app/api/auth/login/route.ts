@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,21 +14,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (email === 'demo@example.com' && password === 'password') {
-      const user = {
-        id: '1',
-        email: 'demo@example.com',
-        name: 'Demo User',
-      };
+    // Find user in database
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
 
-      return NextResponse.json({ user });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
     }
 
-    return NextResponse.json(
-      { error: 'Invalid credentials' },
-      { status: 401 }
-    );
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
+    }
+
+    // Return user without password
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt
+    };
+
+    return NextResponse.json({ user: userResponse });
   } catch (error) {
+    console.error('Login error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

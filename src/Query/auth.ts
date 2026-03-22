@@ -31,7 +31,6 @@ export const useAuth = () => {
   };
 };
 
-// Auth mutations
 export const useSignupMutation = () => {
   const dispatch = useAppDispatch();
 
@@ -76,18 +75,3 @@ export const useLogoutMutation = () => {
   });
 };
 
-export const useCurrentUserQuery = (options?: any) => {
-  const dispatch = useAppDispatch();
-
-  return useQuery({
-    queryKey: ["user"],
-    queryFn: () =>
-      axios
-        .get('/auth/me')
-        .then(res => res.data),
-    onSuccess: (userData: any) => {
-      dispatch(setUser(userData));
-    },
-    ...options,
-  });
-};
