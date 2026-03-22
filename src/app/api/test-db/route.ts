@@ -5,25 +5,26 @@ export async function GET() {
   try {
     // Test database connection
     await prisma.$connect()
-    
+
     // Create a test user
     const user = await prisma.user.create({
       data: {
         email: `test-${Date.now()}@example.com`,
-        name: 'Test User'
+        name: 'Test User',
+        password: 'testpassword123'
       }
     })
-    
+
     // Get all users
     const users = await prisma.user.findMany()
-    
+
     // Clean up - delete the test user
     await prisma.user.delete({
       where: { id: user.id }
     })
-    
+
     await prisma.$disconnect()
-    
+
     return NextResponse.json({
       success: true,
       message: 'Database connection successful!',
@@ -35,11 +36,11 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Database test error:', error)
-    
+
     try {
       await prisma.$disconnect()
-    } catch {}
-    
+    } catch { }
+
     return NextResponse.json({
       success: false,
       message: 'Database connection failed',
